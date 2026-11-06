@@ -1,0 +1,55 @@
+name: Commacd
+options:
+  bundleIdPrefix: com.commacd
+  deploymentTarget:
+    macOS: "13.0"
+configFiles:
+  Debug: Config/Shared.xcconfig
+  Release: Config/Shared.xcconfig
+packages:
+  SwiftTerm:
+    url: https://github.com/migueldeicaza/SwiftTerm
+    exactVersion: 1.99.3
+targets:
+  Commacd:
+    type: application
+    platform: macOS
+    deploymentTarget: "13.0"
+    sources:
+      - path: Commacd
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.commacd.app
+        SWIFT_VERSION: "6.0"
+        ENABLE_HARDENED_RUNTIME: YES
+        CODE_SIGN_IDENTITY: "-"
+    dependencies:
+      - package: SwiftTerm
+    info:
+      path: Commacd/Info.plist
+      properties:
+        LSApplicationCategoryType: public.app-category.developer-tools
+        NSHumanReadableCopyright: ""
+  CommacdTests:
+    type: bundle.unit-test
+    platform: macOS
+    deploymentTarget: "13.0"
+    sources:
+      - path: CommacdTests
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+    dependencies:
+      - target: Commacd
+schemes:
+  Commacd:
+    build:
+      targets:
+        Commacd: all
+        CommacdTests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - CommacdTests

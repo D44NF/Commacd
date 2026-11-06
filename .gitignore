@@ -1,0 +1,5 @@
+.local/
+*.xcodeproj/
+.build/
+DerivedData/
+Config/Local.xcconfig
