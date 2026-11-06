@@ -16,7 +16,7 @@ xcodegen generate
 open Commacd.xcodeproj
 ```
 
-Then build and run the `Commacd` scheme in Xcode (⌘R).
+Then build and run the `Commacd` scheme in Xcode (⌘R). On first build, Xcode will ask to trust SwiftTerm's build plugin — click "Trust & Enable". From the command line, pass `-skipPackagePluginValidation` to `xcodebuild` instead.
 
 ## License
 
