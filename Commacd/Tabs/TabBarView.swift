@@ -35,11 +35,6 @@ private struct TabBarItemView: View {
 
     var body: some View {
         HStack(spacing: 6) {
-            Text(session.title)
-                .font(.system(size: 13))
-                .lineLimit(1)
-                .truncationMode(.tail)
-
             Button(action: onClose) {
                 Image(systemName: "xmark.circle.fill")
                     .font(.system(size: 11))
@@ -47,6 +42,11 @@ private struct TabBarItemView: View {
             .buttonStyle(.plain)
             .foregroundStyle(.secondary)
             .opacity(isHovering || isActive ? 1 : 0)
+
+            Text(session.title)
+                .font(.system(size: 13))
+                .lineLimit(1)
+                .truncationMode(.tail)
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
