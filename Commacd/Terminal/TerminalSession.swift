@@ -9,11 +9,14 @@ final class TerminalSession: ObservableObject, LocalProcessTerminalViewDelegate,
     @Published private(set) var title = "Shell"
     var onExit: (() -> Void)?
 
-    init() {
+    init(initialCommand: String? = nil) {
         terminalView.processDelegate = self
         let shellPath = ShellLocator.loginShellPath()
         let shellName = (shellPath as NSString).lastPathComponent
         terminalView.startProcess(executable: shellPath, execName: "-" + shellName)
+        if let initialCommand {
+            terminalView.process.send(data: ArraySlice(Array((initialCommand + "\n").utf8)))
+        }
     }
 
     func sizeChanged(source: LocalProcessTerminalView, newCols: Int, newRows: Int) {}
