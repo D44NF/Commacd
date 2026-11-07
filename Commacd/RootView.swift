@@ -8,6 +8,7 @@ struct RootView: View {
             TabBarView(windowModel: windowModel)
             if let session = windowModel.activeSession {
                 TerminalSessionView(session: session)
+                    .id(session.id)
             }
         }
         .frame(minWidth: 480, minHeight: 300)
