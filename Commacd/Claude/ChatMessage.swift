@@ -13,11 +13,26 @@ struct ChatMessage: Identifiable {
 
 enum ContentBlock: Identifiable {
     case text(id: String, text: String)
+    case toolUse(ToolUseBlock)
 
     var id: String {
         switch self {
         case .text(let id, _):
             return id
+        case .toolUse(let block):
+            return block.id
         }
     }
+}
+
+struct ToolUseBlock: Identifiable {
+    let id: String
+    let name: String
+    let input: [String: Any]
+    var result: ToolResultBlock?
+}
+
+struct ToolResultBlock {
+    var isError: Bool
+    var summaryText: String
 }
