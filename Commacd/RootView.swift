@@ -8,8 +8,7 @@ struct RootView: View {
         NavigationSplitView {
             SidebarView(windowModel: windowModel, selection: $sidebarSelection)
         } detail: {
-            switch sidebarSelection {
-            case .shell:
+            ZStack {
                 VStack(spacing: 0) {
                     TabBarView(windowModel: windowModel)
                     if let session = windowModel.activeSession {
@@ -17,8 +16,12 @@ struct RootView: View {
                             .id(session.id)
                     }
                 }
-            case .claude, .settings:
-                Color.clear
+                .opacity(sidebarSelection == .shell ? 1 : 0)
+                .allowsHitTesting(sidebarSelection == .shell)
+
+                if sidebarSelection != .shell {
+                    Color(nsColor: .windowBackgroundColor)
+                }
             }
         }
         .frame(minWidth: 480, minHeight: 300)
