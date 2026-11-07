@@ -3,7 +3,8 @@ import Foundation
 import SwiftTerm
 
 @MainActor
-final class TerminalSession: ObservableObject, LocalProcessTerminalViewDelegate {
+final class TerminalSession: ObservableObject, LocalProcessTerminalViewDelegate, Identifiable {
+    let id = UUID()
     let terminalView = LocalProcessTerminalView(frame: .zero)
     @Published private(set) var title = "Shell"
     var onExit: (() -> Void)?
