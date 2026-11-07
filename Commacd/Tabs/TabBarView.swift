@@ -4,15 +4,23 @@ struct TabBarView: View {
     @ObservedObject var windowModel: TerminalWindowModel
 
     var body: some View {
-        HStack(spacing: 0) {
-            ForEach(windowModel.sessions) { session in
-                TabBarItemView(
-                    session: session,
-                    isActive: session.id == windowModel.activeSessionID,
-                    onSelect: { windowModel.activeSessionID = session.id },
-                    onClose: { windowModel.closeTab(id: session.id) }
-                )
+        VStack(spacing: 0) {
+            HStack(spacing: 4) {
+                ForEach(windowModel.sessions) { session in
+                    TabBarItemView(
+                        session: session,
+                        isActive: session.id == windowModel.activeSessionID,
+                        onSelect: { windowModel.activeSessionID = session.id },
+                        onClose: { windowModel.closeTab(id: session.id) }
+                    )
+                }
+                Spacer(minLength: 0)
             }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(.bar)
+
+            Divider()
         }
     }
 }
@@ -23,18 +31,32 @@ private struct TabBarItemView: View {
     let onSelect: () -> Void
     let onClose: () -> Void
 
+    @State private var isHovering = false
+
     var body: some View {
-        HStack {
+        HStack(spacing: 6) {
             Text(session.title)
+                .font(.system(size: 13))
+                .lineLimit(1)
+                .truncationMode(.tail)
+
             Button(action: onClose) {
-                Image(systemName: "xmark")
+                Image(systemName: "xmark.circle.fill")
+                    .font(.system(size: 11))
             }
             .buttonStyle(.plain)
+            .foregroundStyle(.secondary)
+            .opacity(isHovering || isActive ? 1 : 0)
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
-        .background(isActive ? Color.accentColor.opacity(0.2) : .clear)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .frame(maxWidth: 200, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                .fill(isActive ? Color.accentColor.opacity(0.18) : (isHovering ? Color.primary.opacity(0.06) : .clear))
+        )
         .contentShape(Rectangle())
         .onTapGesture(perform: onSelect)
+        .onHover { isHovering = $0 }
     }
 }
