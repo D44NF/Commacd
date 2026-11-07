@@ -75,6 +75,8 @@ final class ClaudeChatSession: ObservableObject, Identifiable {
             handleStreamEvent(json)
         case "assistant":
             reconcileAssistantMessage(json)
+        case "user":
+            handleToolResultMessage(json)
         case "result":
             isStreaming = false
         default:
@@ -107,9 +109,18 @@ final class ClaudeChatSession: ObservableObject, Identifiable {
         guard let message = json["message"] as? [String: Any],
               let content = message["content"] as? [[String: Any]] else { return }
         let blocks: [ContentBlock] = content.compactMap { block in
-            guard block["type"] as? String == "text",
-                  let text = block["text"] as? String else { return nil }
-            return .text(id: UUID().uuidString, text: text)
+            switch block["type"] as? String {
+            case "text":
+                guard let text = block["text"] as? String else { return nil }
+                return .text(id: UUID().uuidString, text: text)
+            case "tool_use":
+                guard let id = block["id"] as? String,
+                      let name = block["name"] as? String else { return nil }
+                let input = block["input"] as? [String: Any] ?? [:]
+                return .toolUse(ToolUseBlock(id: id, name: name, input: input))
+            default:
+                return nil
+            }
         }
         guard !blocks.isEmpty else { return }
         if let id = currentAssistantMessageID,
@@ -119,5 +130,37 @@ final class ClaudeChatSession: ObservableObject, Identifiable {
             messages.append(ChatMessage(id: UUID().uuidString, role: .assistant, blocks: blocks))
         }
         currentAssistantMessageID = nil
+    }
+
+    private func handleToolResultMessage(_ json: [String: Any]) {
+        guard let message = json["message"] as? [String: Any],
+              let content = message["content"] as? [[String: Any]] else { return }
+        for block in content {
+            guard block["type"] as? String == "tool_result",
+                  let toolUseID = block["tool_use_id"] as? String else { continue }
+            let isError = block["is_error"] as? Bool ?? false
+            let summary = Self.summarizeToolResultContent(block["content"])
+            attachResult(toolUseID: toolUseID, result: ToolResultBlock(isError: isError, summaryText: summary))
+        }
+    }
+
+    private static func summarizeToolResultContent(_ content: Any?) -> String {
+        if let text = content as? String { return text }
+        if let blocks = content as? [[String: Any]] {
+            return blocks.compactMap { $0["text"] as? String }.joined(separator: "\n")
+        }
+        return ""
+    }
+
+    private func attachResult(toolUseID: String, result: ToolResultBlock) {
+        for messageIndex in messages.indices {
+            for blockIndex in messages[messageIndex].blocks.indices {
+                guard case .toolUse(var toolUseBlock) = messages[messageIndex].blocks[blockIndex],
+                      toolUseBlock.id == toolUseID else { continue }
+                toolUseBlock.result = result
+                messages[messageIndex].blocks[blockIndex] = .toolUse(toolUseBlock)
+                return
+            }
+        }
     }
 }
