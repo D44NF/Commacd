@@ -6,5 +6,8 @@ struct CommacdApp: App {
         WindowGroup {
             RootView()
         }
+        .commands {
+            TabCommands()
+        }
     }
 }
