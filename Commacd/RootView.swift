@@ -5,7 +5,7 @@ struct RootView: View {
 
     var body: some View {
         NavigationSplitView {
-            SidebarView(windowModel: windowModel)
+            SidebarView()
         } detail: {
             VStack(spacing: 0) {
                 TabBarView(windowModel: windowModel)
