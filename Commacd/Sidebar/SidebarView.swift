@@ -44,6 +44,7 @@ private struct SidebarRow: View {
         Button(action: action) {
             Label(title, systemImage: systemImage)
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .padding(.horizontal, 8)
