@@ -4,11 +4,15 @@ struct RootView: View {
     @StateObject private var windowModel = TerminalWindowModel()
 
     var body: some View {
-        VStack(spacing: 0) {
-            TabBarView(windowModel: windowModel)
-            if let session = windowModel.activeSession {
-                TerminalSessionView(session: session)
-                    .id(session.id)
+        NavigationSplitView {
+            SidebarView(windowModel: windowModel)
+        } detail: {
+            VStack(spacing: 0) {
+                TabBarView(windowModel: windowModel)
+                if let session = windowModel.activeSession {
+                    TerminalSessionView(session: session)
+                        .id(session.id)
+                }
             }
         }
         .frame(minWidth: 480, minHeight: 300)
